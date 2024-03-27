@@ -6,7 +6,7 @@ resource "aws_instance" "ubuntuserver" {
   ami           = "ami-04cebc8d6c4f297a3"
   instance_type = "t2.micro"
   vpc_security_group_ids = ["sg-02aecc7bf2b1840dc"]
-  key_name      = "id_rsa"
+  key_name      = "BQ"
   tags = {
     Name    = "webapp_instance"
     Owner   = "Semen Seleznev"
