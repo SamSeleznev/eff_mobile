@@ -1,0 +1,8 @@
+---
+- name: Deploy dockerized web app
+  hosts: PROD_SERVER_WEB
+  become: yes
+
+  roles:
+    - required-packages
+    - webapp

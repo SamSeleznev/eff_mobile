@@ -1,0 +1,44 @@
+- name: Allow {{ ansible_user }} to run sudo without password
+  copy:
+    content: "{{ ansible_user }} ALL=(ALL:ALL) NOPASSWD: ALL"
+    dest: /etc/sudoers.d/{{ ansible_user }}
+    validate: 'visudo -cf %s'
+
+- name: Copy Dockerfile to remote host
+  template:
+    src: "Dockerfile.j2"
+    dest: "/home/{{ ansible_user }}/Dockerfile"
+
+- name: Copy docker-compose.yml to remote host
+  template:
+    src: "docker-compose.yml.j2"
+    dest: "/home/{{ ansible_user }}/docker-compose.yml"
+
+- name: Ensure /home/{{ ansible_user }}/html directory exists
+  file:
+    path: /home/{{ ansible_user }}/html
+    state: directory
+    mode: '0755'
+
+- name: Copy index.php to remote host
+  copy:
+    src: "files/index.php"
+    dest: "/home/{{ ansible_user }}/html/index.php"
+
+- name: Ensure /home/{{ ansible_user }}/nginx directory exists
+  file:
+    path: /home/{{ ansible_user }}/nginx
+    state: directory
+    mode: '0755'
+
+- name: Generate Nginx config from template
+  template:
+    src: "nginx.conf.j2"
+    dest: "/home/{{ ansible_user }}/nginx/default.conf"
+
+- name: Ensure docker-compose is up and running
+  command: docker-compose up -d
+  args:
+    chdir: "/home/{{ ansible_user }}"
+  register: docker_compose_up
+  changed_when: "'Creating' in docker_compose_up.stdout or 'Recreating' in docker_compose_up.stdout"
